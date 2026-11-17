@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Bismillah Traders BT monogram">
+  <defs>
+    <linearGradient id="navy" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1B4DB5"/><stop offset="1" stop-color="#071B4A"/>
+    </linearGradient>
+    <linearGradient id="gold" gradientUnits="userSpaceOnUse" x1="0" y1="110" x2="0" y2="360">
+      <stop offset="0" stop-color="#FFD84A"/><stop offset="1" stop-color="#FFB800"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="url(#navy)"/>
+  <rect x="34" y="34" width="444" height="444" rx="96" fill="none" stroke="#FFC20E" stroke-width="8" opacity=".9"/>
+  <g transform="translate(-2 -20)" fill="none" stroke="url(#gold)" stroke-width="42" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M122 142 V342"/>
+    <path d="M122 142 H178 a44 44 0 0 1 0 88 H122"/>
+    <path d="M122 230 H188 a56 56 0 0 1 0 112 H122"/>
+    <path d="M280 142 H420"/>
+    <path d="M350 142 V342"/>
+  </g>
+  <path d="M104 398 Q256 440 408 388" fill="none" stroke="#D7261E" stroke-width="24" stroke-linecap="round"/>
+</svg>
