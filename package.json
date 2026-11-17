@@ -1,0 +1,44 @@
+{
+  "name": "bismillah-traders-pos",
+  "productName": "Bismillah Traders POS",
+  "version": "0.1.0",
+  "description": "Offline POS and accounting for Bismillah Traders (Cold Drinks & Juices)",
+  "main": "electron/main.js",
+  "author": "Bismillah Traders",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "node tools/dev-server.js",
+    "test": "node --test",
+    "assets": "python3 tools/make-assets.py",
+    "postinstall": "electron-builder install-app-deps",
+    "dist": "electron-builder --win nsis portable --x64",
+    "dist:dir": "electron-builder --win --dir --x64"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.7.0"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.bismillahtraders.pos",
+    "productName": "Bismillah Traders POS",
+    "directories": { "output": "dist", "buildResources": "build" },
+    "files": ["electron/**", "src/**", "package.json", "!**/*.test.js"],
+    "asarUnpack": ["**/node_modules/better-sqlite3/**"],
+    "win": { "icon": "build/icon.ico", "target": ["nsis", "portable"] },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Bismillah Traders POS"
+    },
+    "portable": { "artifactName": "BismillahTradersPOS-Portable-${version}.exe" }
+  }
+}
