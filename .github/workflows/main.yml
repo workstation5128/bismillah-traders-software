@@ -18,7 +18,7 @@ jobs:
       - name: Run automated tests
         run: npm test
       - name: Build installer and portable exe
-        run: npm run dist
+        run: npx electron-builder --win nsis portable --x64 --publish never
       - name: Save the installer files
         uses: actions/upload-artifact@v4
         with:
