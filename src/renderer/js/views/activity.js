@@ -5,7 +5,7 @@ import { state } from '../shell.js';
 const LABEL = {
   'login.success': 'Signed in', 'login.failed': 'Failed sign-in', 'login.locked': 'Account locked', logout: 'Signed out',
   'setup.admin_created': 'Owner account created', 'settings.updated': 'Settings changed', 'user.created': 'User added', 'user.updated': 'User changed',
-  'user.password_reset': 'Password reset', 'user.password_changed': 'Password changed', 'backup.manual': 'Backup created', 'system.integrity_check': 'Integrity check',
+  'user.password_reset': 'Password reset', 'user.password_changed': 'Password changed', 'backup.manual': 'Backup created', 'product.created': 'Product added', 'product.updated': 'Product changed', 'product.activated': 'Product activated', 'product.deactivated': 'Product made inactive', 'stock.adjustment': 'Stock adjusted', 'stock.damage': 'Damage recorded', 'stock.audit': 'Stock counted', 'system.integrity_check': 'Integrity check',
 };
 const PAGE = 50;
 

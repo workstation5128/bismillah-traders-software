@@ -8,7 +8,7 @@ export const NAV = [
       about: 'Customer accounts, udhaar balances, payments received, statements and full ledgers.' },
   ] },
   { group: 'Stock', items: [
-    { id: 'products', label: 'Products and stock', icon: 'box', key: 'F2', perm: 'products.view', stage: 2,
+    { id: 'products', label: 'Products and stock', icon: 'box', key: 'F2', perm: 'products.view',
       about: 'Products with pack, carton and crate conversions, three price levels, stock movements and low-stock alerts.' },
     { id: 'purchases', label: 'Purchases', icon: 'truck', key: 'F4', perm: 'suppliers.manage', stage: 5,
       about: 'Purchase entry, purchase returns and corrections that raise stock and update supplier balances.' },

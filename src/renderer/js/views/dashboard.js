@@ -17,7 +17,7 @@ const KPI = [
   { k: 'grossProfit', label: 'Gross profit', icon: 'trend', cls: 'profit', sub: 'Net sales minus cost of goods sold' },
   { k: 'expenses', label: 'Expenses', icon: 'wallet', cls: 'alert', sub: 'Shop running costs' },
   { k: 'netProfit', label: 'Net operating profit', icon: 'trend', cls: 'profit', sub: 'Gross profit minus expenses' },
-  { k: 'stockValue', label: 'Stock value', icon: 'layers', sub: 'At cost price' },
+  { k: 'stockValue', label: 'Stock value', icon: 'layers', sub: 'Stock in hand, at cost price' },
 ];
 
 const greeting = () => { const hr = new Date().getHours(); return hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening'; };
@@ -57,10 +57,16 @@ export async function render({ state, navigate }) {
     h('img', { class: 'emblem', src: 'assets/logo-emblem-md.png', alt: `${s.business_name} logo` }));
   banner.insertAdjacentHTML('beforeend', WAVES);
 
-  const lowStock = h('div', { class: 'card' }, h('div', { class: 'card-head' }, h('h3', null, 'Low-stock products'), icon('bell')),
-    h('div', { class: 'empty' }, h('div', { class: 'ic-big' }, icon('box', 24)), h('strong', null, 'No products yet'),
-      h('span', null, 'Products you add will show here when stock falls to the alert level.'),
-      h('button', { class: 'btn btn-ghost btn-sm', onClick: () => navigate('products') }, 'Go to products')));
+  const lowStock = h('div', { class: 'card' });
+  function paintLow(items) {
+    lowStock.replaceChildren(h('div', { class: 'card-head', style: 'padding-bottom:6px' }, h('h3', null, 'Low-stock products'), icon('bell')),
+      items.length ? h('div', null, items.map((x) => h('div', { class: 'lowrow' }, h('div', null, h('strong', null, x.name), h('div', { class: 'muted', style: 'font-size:12.5px' }, `${x.stockText} (${x.stockQty} bottles). Alert at ${x.alert}`)),
+        h('span', { class: `chip ${x.status === 'out' ? 'bad' : 'gold'}` }, x.stockQty === 0 ? 'Out' : 'Low'))))
+        : h('div', { class: 'empty' }, h('div', { class: 'ic-big' }, icon('box', 24)), h('strong', null, 'Nothing is running low'),
+          h('span', null, 'Products appear here when stock falls to their alert level.'),
+          h('button', { class: 'btn btn-ghost btn-sm', onClick: () => navigate('products') }, 'Go to products')));
+  }
+  paintLow([]);
   const empties = h('div', { class: 'card' }, h('div', { class: 'card-head' }, h('h3', null, 'Empties in your shop'), icon('repeat')),
     h('div', { class: 'pair' }, h('div', { class: 'tile' }, h('div', { class: 'muted' }, 'Empty bottles'), h('div', { class: 'v' }, '\u2014')),
       h('div', { class: 'tile' }, h('div', { class: 'muted' }, 'Empty crates'), h('div', { class: 'v' }, '\u2014'))),
@@ -81,7 +87,7 @@ export async function render({ state, navigate }) {
     periodText.textContent = `Showing ${periodLabel(data.period)}`;
   }
   async function load() {
-    try { paintKpis(await api('dashboard.summary', period)); }
+    try { const d = await api('dashboard.summary', period); paintKpis(d); paintLow(d.lowStock || []); }
     catch (e) { periodText.textContent = e.message; }
   }
   function paintHealth(hl) {

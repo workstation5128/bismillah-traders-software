@@ -1,4 +1,4 @@
-import { h, clear, icon, openModal, field, formError, showFieldErrors, toast, timeAgo, fmtDate } from './ui.js';
+import { h, clear, icon, openModal, field, formError, showFieldErrors, toast, timeAgo, fmtDayDate, fmtTime } from './ui.js';
 import { api, session } from './api.js';
 import { NAV, flat, can, titleOf } from './nav.js';
 import { renderPlaceholder } from './views/placeholder.js';
@@ -9,10 +9,17 @@ const BUILT = {
   users: () => import('./views/users.js'),
   activity: () => import('./views/activity.js'),
   backup: () => import('./views/backup.js'),
+  products: () => import('./views/products.js'),
 };
 
 export const state = { settings: {}, health: null };
-let current = null, navRoot, viewEl, titleEl, backupChip;
+let current = null, navRoot, viewEl, titleEl, backupChip, clockTimer = null;
+export function stopClock() { clearInterval(clockTimer); clockTimer = null; }
+function startClock(dateEl, timeEl) {
+  stopClock();
+  const tick = () => { const n = new Date(); dateEl.textContent = fmtDayDate(n, state.settings.date_format); timeEl.textContent = fmtTime(n, { seconds: true }); };
+  tick(); clockTimer = setInterval(tick, 1000);
+}
 
 export async function refreshHealth() {
   try { state.health = await api('system.health'); } catch { /* shown as unknown */ }
@@ -109,6 +116,9 @@ export async function mountShell(root, { onLogout }) {
     h('span', { class: 'avatar' }, initials), h('span', null, user.displayName.split(' ')[0]));
   document.addEventListener('click', () => { menu.hidden = true; });
 
+  const clockDate = h('span', { class: 'd' }), clockTime = h('span', { class: 't' });
+  const clockBox = h('div', { class: 'clock', title: 'Date and time from this computer', 'aria-label': 'Current date and time' }, icon('clock', 18), clockTime, clockDate);
+  startClock(clockDate, clockTime);
   viewEl = h('main', { class: 'view', id: 'view', tabindex: '-1' });
   root.replaceChildren(h('div', { class: 'app', style: 'position:relative' },
     h('aside', { class: 'sidebar' },
@@ -118,7 +128,7 @@ export async function mountShell(root, { onLogout }) {
     h('div', { class: 'main' },
       h('header', { class: 'topbar' }, titleEl,
         h('button', { class: 'search-btn', onClick: openPalette, 'aria-label': 'Search' }, icon('search', 18), 'Search screens', h('kbd', null, 'Ctrl K')),
-        backupChip, h('span', { class: 'top-chip' }, icon('calendar', 18), fmtDate(new Date(), state.settings.date_format)), userBtn, menu),
+        backupChip, clockBox, userBtn, menu),
       viewEl)));
 
   const keys = Object.fromEntries(flat().filter((n) => n.key && can(user, n.perm)).map((n) => [n.key, n.id]));

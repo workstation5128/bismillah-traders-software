@@ -1,11 +1,12 @@
 import { h } from './ui.js';
 import { api, session, onAuthLost } from './api.js';
 import { renderLogin, renderSetup } from './views/auth.js';
-import { mountShell, state } from './shell.js';
+import { mountShell, state, stopClock } from './shell.js';
 
 const root = document.getElementById('root');
 
 async function start(message) {
+  stopClock();
   let status;
   try { status = await api('auth.status'); }
   catch (e) { root.replaceChildren(h('div', { class: 'splash', style: 'color:#fff;text-align:center;padding:40px' }, e.message)); return; }

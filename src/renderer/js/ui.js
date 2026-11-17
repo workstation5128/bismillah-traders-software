@@ -53,6 +53,7 @@ const P = {
   x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
   layers: '<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
   info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
   coins: '<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/>',
 };
 export function icon(name, size) {
@@ -132,16 +133,7 @@ export function fmtRs(paise) {
   const whole = Math.floor(a / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   return `${neg ? '-' : ''}Rs. ${whole}.${String(a % 100).padStart(2, '0')}`;
 }
-export function fmtDate(value, style = 'DD/MM/YYYY') {
-  const d = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(d.getTime())) return '';
-  const dd = String(d.getDate()).padStart(2, '0'), mm = String(d.getMonth() + 1).padStart(2, '0'), yy = d.getFullYear();
-  return style === 'MM/DD/YYYY' ? `${mm}/${dd}/${yy}` : style === 'YYYY-MM-DD' ? `${yy}-${mm}-${dd}` : `${dd}/${mm}/${yy}`;
-}
-export function fmtDateTime(iso, style) {
-  const d = new Date(iso); if (Number.isNaN(d.getTime())) return '';
-  return `${fmtDate(d, style)} ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-}
+export { fmtDate, fmtTime, fmtDateTime, fmtDayDate, localToday } from './datetime.js';
 export function fmtBytes(n) {
   if (n < 1024) return `${n} B`;
   if (n < 1048576) return `${(n / 1024).toFixed(1)} KB`;
@@ -155,4 +147,3 @@ export function timeAgo(iso) {
   if (s < 86400) return `${Math.round(s / 3600)} hr ago`;
   const d = Math.round(s / 86400); return `${d} day${d === 1 ? '' : 's'} ago`;
 }
-export const localToday = () => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };

@@ -19,6 +19,7 @@ const { AppError, bad, denied } = require('../core/errors');
 const { PERMISSIONS } = require('../core/permissions');
 const system = require('../core/system');
 const backup = require('../core/backup');
+const products = require('../core/products');
 
 const isoDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || ''));
 const isMonth = (s) => /^\d{4}-\d{2}$/.test(String(s || ''));
@@ -72,19 +73,28 @@ function createApp({ dataDir, version = '0.0.0' }) {
     } },
     'system.integrityCheck': { perm: 'backup.manage', fn: (c) => system.integrityCheck(db, c.user) },
 
-    'dashboard.summary': { perm: 'dashboard.view', fn: (_c, p) => {
+    'products.list': { perm: 'products.view', fn: (c, p) => ({
+      products: products.listProducts(db, p, authLib.can(c.user.permissions, 'products.view_cost')),
+      canSeeCost: authLib.can(c.user.permissions, 'products.view_cost'), lookups: products.lookups(db) }) },
+    'products.get': { perm: 'products.view', fn: (c, p) => products.getProduct(db, Number(p?.id), authLib.can(c.user.permissions, 'products.view_cost')) },
+    'products.create': { perm: 'products.manage', fn: (c, p) => products.createProduct(db, c.user, p) },
+    'products.update': { perm: 'products.manage', fn: (c, p) => { products.updateProduct(db, c.user, Number(p?.id), p); return true; } },
+    'products.setActive': { perm: 'products.manage', fn: (c, p) => { products.setActive(db, c.user, Number(p?.id), !!p?.active); return true; } },
+    'products.adjust': { perm: 'inventory.adjust', fn: (c, p) => products.adjustStock(db, c.user, { ...p, productId: Number(p?.productId) }) },
+
+    'dashboard.summary': { perm: 'dashboard.view', fn: (c, p) => {
       const mode = p?.mode === 'month' ? 'month' : 'day';
       const value = p?.value || (mode === 'month' ? today().slice(0, 7) : today());
       if (mode === 'day' && !isoDate(value)) throw bad('Pick a valid date.');
       if (mode === 'month' && !isMonth(value)) throw bad('Pick a valid month.');
-      // Stage 1: sales/purchases/stock tables do not exist yet, so nothing is invented.
-      // Each metric becomes a real number when its module is built (see "feeds").
+      // A metric is a real number only when the module that feeds it exists; otherwise null (shown as a dash).
       const metrics = {
         sales: null, bills: null, cashReceived: null, udhaar: null, customerOutstanding: null,
         purchases: null, supplierPayable: null, grossProfit: null, expenses: null, netProfit: null,
-        stockValue: null, bankBalance: null, emptyBottles: null, emptyCrates: null,
+        stockValue: authLib.can(c.user.permissions, 'products.view_cost') ? products.stockValue(db) : null,
+        bankBalance: null, emptyBottles: null, emptyCrates: null,
       };
-      return { period: { mode, value }, live: false, metrics, lowStock: [], recentBills: [] };
+      return { period: { mode, value }, live: false, metrics, lowStock: products.lowStock(db), recentBills: [] };
     } },
   };
 

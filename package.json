@@ -1,7 +1,7 @@
 {
   "name": "bismillah-traders-pos",
   "productName": "Bismillah Traders POS",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "Offline POS and accounting for Bismillah Traders (Cold Drinks & Juices)",
   "main": "electron/main.js",
   "author": "Bismillah Traders",
@@ -13,8 +13,8 @@
     "test": "node --test",
     "assets": "python3 tools/make-assets.py",
     "postinstall": "electron-builder install-app-deps",
-    "dist": "electron-builder --win nsis portable --x64",
-    "dist:dir": "electron-builder --win --dir --x64"
+    "dist": "electron-builder --win nsis portable --x64 --publish never",
+    "dist:dir": "electron-builder --win --dir --x64 --publish never"
   },
   "dependencies": {
     "better-sqlite3": "^11.7.0"

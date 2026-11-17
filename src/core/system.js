@@ -2,6 +2,7 @@
 const fs = require('fs');
 const { listBackups } = require('./backup');
 const { audit } = require('./audit');
+const products = require('./products');
 
 /** Quick, read-only status for the dashboard and Settings. */
 function health(db, { dataDir, backupDir, version }) {
@@ -30,7 +31,9 @@ function integrityCheck(db, actor) {
     sqliteOk: full.length === 1 && full[0] === 'ok', sqliteMessages: full,
     foreignKeyViolations: fk.length, journalBalanced: t.d === t.c, totalDebit: t.d, totalCredit: t.c,
   };
-  result.ok = result.sqliteOk && result.foreignKeyViolations === 0 && result.journalBalanced;
+  const mismatches = products.stockMismatches(db);
+  result.stockMismatches = mismatches.length; result.stockMismatchDetail = mismatches.slice(0, 10);
+  result.ok = result.sqliteOk && result.foreignKeyViolations === 0 && result.journalBalanced && mismatches.length === 0;
   audit(db, actor, 'system.integrity_check', 'database', null, { ok: result.ok });
   return result;
 }

@@ -36,7 +36,10 @@ test('dashboard reports "not live" rather than inventing numbers', async () => {
   const { call } = await adminApp();
   const d = (await call('dashboard.summary', { mode: 'day', value: '2026-11-15' })).data;
   assert.equal(d.live, false);
-  for (const v of Object.values(d.metrics)) assert.equal(v, null);
+  for (const [k, v] of Object.entries(d.metrics)) {
+    if (k === 'stockValue') assert.equal(v, 0, 'stock value is a real zero (no products)');   // fed by Products (Stage 2)
+    else assert.equal(v, null, k);                                                              // still waiting for their modules
+  }
   assert.equal((await call('dashboard.summary', { mode: 'day', value: 'nonsense' })).ok, false);
   assert.equal((await call('dashboard.summary', { mode: 'month', value: '2026-11' })).ok, true);
 });
@@ -71,7 +74,7 @@ test('manual backup is a complete, openable copy; integrity check passes', async
   const chk = (await call('system.integrityCheck')).data;
   assert.equal(chk.ok, true); assert.equal(chk.journalBalanced, true);
   const h = (await call('system.health')).data;
-  assert.equal(h.integrityOk, true); assert.equal(h.schemaVersion, 1); assert.ok(h.lastBackupAt);
+  assert.equal(h.integrityOk, true); assert.equal(h.schemaVersion, 2); assert.ok(h.lastBackupAt);
 });
 
 test('unexpected errors are logged and not leaked to the user', async () => {
